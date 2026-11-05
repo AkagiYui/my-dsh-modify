@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Copy Reply as Image",
+    "description": "Adds a Copy as image action after the branch button of every finalized AI reply: renders that reply as a PNG card and copies it to the clipboard."
+  }
+}

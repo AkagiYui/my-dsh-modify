@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+
+# Packed tarballs and publish leftovers
+*.tgz
+*.tar.gz
+
+# Credentials — never commit these
+.npmrc
+.env
+.env.*
+!/.env.example
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Logs and temp output
+*.log
+npm-debug.log*
+.dsh-local/

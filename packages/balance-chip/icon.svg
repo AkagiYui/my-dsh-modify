@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-label="Balance">
+  <rect x="1.5" y="1.5" width="21" height="21" rx="6" fill="#EDF2FF"/>
+  <g fill="none" stroke="#2F6FEB" stroke-width="1.7" stroke-linecap="round">
+    <path d="M8.4 6.6 12 10.6l3.6-4"/>
+    <path d="M12 10.6V17.4"/>
+    <path d="M9 12.7h6"/>
+    <path d="M9 14.9h6"/>
+  </g>
+</svg>

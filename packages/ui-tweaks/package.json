@@ -1,0 +1,55 @@
+{
+  "name": "@akagiyui/ui-tweaks",
+  "version": "1.4.0",
+  "description": "One place for interface tweaks: conversation content width, sidebar account label, hiding the feedback entries, the sidebar More row, and the Full access risk dialog.",
+  "license": "MIT",
+  "author": "AkagiYui (https://github.com/AkagiYui)",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "ui",
+    "tweaks",
+    "sidebar",
+    "width"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkagiYui/my-dsh-modify.git",
+    "directory": "packages/ui-tweaks"
+  },
+  "homepage": "https://github.com/AkagiYui/my-dsh-modify/tree/main/packages/ui-tweaks#readme",
+  "bugs": {
+    "url": "https://github.com/AkagiYui/my-dsh-modify/issues"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}

@@ -1,0 +1,3 @@
+- insert:
+    - id: balance-chip
+      name: '@akagiyui/balance-chip'

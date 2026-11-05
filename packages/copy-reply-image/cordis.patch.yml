@@ -1,0 +1,3 @@
+- insert:
+    - id: copy-reply-image
+      name: '@akagiyui/copy-reply-image'

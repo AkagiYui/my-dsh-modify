@@ -1,0 +1,61 @@
+{
+  "name": "@akagiyui/copy-reply-image",
+  "version": "1.0.0",
+  "description": "Copies an AI reply as a PNG card: one action after the branch button of every finalized assistant message.",
+  "license": "MIT",
+  "author": "AkagiYui (https://github.com/AkagiYui)",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "clipboard",
+    "image",
+    "png",
+    "screenshot"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkagiYui/my-dsh-modify.git",
+    "directory": "packages/copy-reply-image"
+  },
+  "homepage": "https://github.com/AkagiYui/my-dsh-modify/tree/main/packages/copy-reply-image#readme",
+  "bugs": {
+    "url": "https://github.com/AkagiYui/my-dsh-modify/issues"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-chat"
+      ]
+    }
+  }
+}

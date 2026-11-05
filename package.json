@@ -1,0 +1,20 @@
+{
+  "name": "my-dsh-modify",
+  "version": "0.0.0",
+  "private": true,
+  "description": "DeepSeek Harness Web UI plugins: interface tweaks, a balance chip, and copy-reply-as-image.",
+  "license": "MIT",
+  "author": "AkagiYui (https://github.com/AkagiYui)",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "check": "node scripts/check.mjs",
+    "build": "node packages/copy-reply-image/build.mjs",
+    "pack:dry": "node scripts/check.mjs && node scripts/pack-dry.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
