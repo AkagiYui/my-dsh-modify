@@ -18,7 +18,7 @@ DeepSeek Harness Web UI 的五个独立开关，全部位于 **设置 → 通用
 DSH 按包名安装 bundle。直接让 agent 装，或者自己调用工具：
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/ui-tweaks"
+plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
 ```
 
 安装前会校验 `engines.dsh`：超出 `>=0.2.1-rc.5` 的 Harness 会被拒绝，而不是加载

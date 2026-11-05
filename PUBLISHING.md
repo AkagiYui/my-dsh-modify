@@ -6,38 +6,44 @@ issues and release notes live.
 
 ## Before the first publish
 
-### 1. Own the scope
+### 1. Own the names
 
-Every package is named `@akagiyui/<name>`, which means the npm account **must**
-be `akagiyui` (or an organization you belong to). Check:
+The three packages are named:
+
+| Directory | npm name | Why |
+| --- | --- | --- |
+| `packages/ui-tweaks` | `@akagiyui/dsh-ui-tweaks` | `dsh-ui-tweaks` without a scope was already taken on npm |
+| `packages/balance-chip` | `dsh-balance-chip` | unscoped name was free |
+| `packages/copy-reply-image` | `dsh-copy-reply-image` | unscoped name was free |
+
+Only the scoped one depends on the npm account being `akagiyui` (or an
+organization you belong to):
 
 ```bash
 npm login
 npm whoami        # must print akagiyui
 ```
 
-If your npm username is different, rename the scope everywhere first. The scope
-appears in the manifest, the bundle patch, and the client factory id — all three
-must agree, which is exactly what `npm run check` verifies:
+The package name appears in three places — the manifest, the bundle patch, and
+the client factory id — and all three must agree. `npm run check` verifies
+exactly that, so rename with confidence:
 
 ```bash
-# macOS
-grep -rl '@akagiyui/' . --exclude-dir=.git | xargs sed -i '' 's|@akagiyui/|@yourname/|g'
-# GNU/Linux
-grep -rl '@akagiyui/' . --exclude-dir=.git | xargs sed -i 's|@akagiyui/|@yourname/|g'
-
+# change a name, then:
 npm run check
 ```
 
 ### 2. Turn on 2FA
 
-npm requires it for publishing and it protects the name you are about to claim.
+npm requires it for publishing and it protects the names you are about to claim.
 Expect an OTP prompt on every publish.
 
 ### 3. Confirm the names are free
 
 ```bash
-npm view @akagiyui/ui-tweaks version    # 404 (non-zero exit) means free
+npm view @akagiyui/dsh-ui-tweaks version   # 404 (non-zero exit) means free
+npm view dsh-balance-chip version
+npm view dsh-copy-reply-image version
 ```
 
 ## Pre-flight, every time
@@ -70,11 +76,11 @@ them a scoped publish is private and rejected unless you pay for a private scope
 Then verify the registry, not your terminal:
 
 ```bash
-npm view @akagiyui/ui-tweaks version dist.tarball
+npm view @akagiyui/dsh-ui-tweaks version dist.tarball
 ```
 
 And verify that it **installs**: use a throwaway DSH profile and install by spec
-(`plugin_manager` → `install_bundle` → `@akagiyui/ui-tweaks`). Installing into
+(`plugin_manager` → `install_bundle` → `@akagiyui/dsh-ui-tweaks`). Installing into
 the profile you use every day does not prove that a clean profile works.
 
 ## Versions
@@ -94,11 +100,16 @@ npm publish
 `npm version` without `--no-git-tag-version` also creates a `v0.1.1` tag, which
 collides across packages in a monorepo. Use the `<package>@<version>` form above.
 
+The tag carries the **directory** name, not the npm name: `ui-tweaks@0.1.1`
+publishes `@akagiyui/dsh-ui-tweaks@0.1.1`. That keeps `/` out of tags — GitHub's
+tag filter `*@*` does not match across a slash — and `publish.yaml` maps the
+directory to whatever name its manifest declares.
+
 ### If you publish something wrong
 
 - **Missing files, wrong metadata, still usable:** publish a patch version. Do
   not unpublish.
-- **Broken for everyone:** `npm deprecate @akagiyui/ui-tweaks@0.1.1 "Broken, use 0.1.2"`,
+- **Broken for everyone:** `npm deprecate @akagiyui/dsh-ui-tweaks@0.1.1 "Broken, use 0.1.2"`,
   then publish the fix.
 - **Unpublish** only works within 72 hours, only if nothing depends on the
   version, and the version number is burned afterwards.

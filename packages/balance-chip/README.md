@@ -17,7 +17,7 @@ Three surfaces:
 ## Install
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/balance-chip"
+plugin_manager   action: install_bundle   target: "dsh-balance-chip"
 ```
 
 ## Where the numbers come from

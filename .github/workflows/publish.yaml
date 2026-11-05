@@ -30,20 +30,34 @@ jobs:
         id: target
         run: |
           set -euo pipefail
+          # <package>@<version>, where <package> is the directory name. Prefer the
+          # directory because a scoped package name contains "/", which the tag
+          # filter's "*" does not cross. A full package name is still accepted.
           name="${GITHUB_REF_NAME%@*}"
-          version="${GITHUB_REF_NAME#*@}"
+          version="${GITHUB_REF_NAME##*@}"
+
           dir="packages/$name"
           if [ ! -d "$dir" ]; then
-            echo "::error::tag names a package that does not exist: $dir"
+            dir=""
+            for candidate in packages/*/; do
+              if [ "$(node -p "require('./$candidate/package.json').name")" = "$name" ]; then
+                dir="${candidate%/}"
+                break
+              fi
+            done
+          fi
+          if [ -z "$dir" ]; then
+            echo "::error::no package matches the tag's name: $name"
             exit 1
           fi
+
           actual=$(node -p "require('./$dir/package.json').version")
           if [ "$actual" != "$version" ]; then
             echo "::error::tag says $version but $dir/package.json says $actual"
             exit 1
           fi
           echo "dir=$dir" >> "$GITHUB_OUTPUT"
-          echo "Publishing $name@$version from $dir"
+          echo "Publishing $(node -p "require('./$dir/package.json').name")@$version from $dir"
 
       - run: npm run check
       - run: npm run pack:dry

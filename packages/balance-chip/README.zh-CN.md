@@ -16,7 +16,7 @@
 ## 安装
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/balance-chip"
+plugin_manager   action: install_bundle   target: "dsh-balance-chip"
 ```
 
 ## 数字从哪里来

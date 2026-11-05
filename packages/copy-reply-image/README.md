@@ -9,7 +9,7 @@ reply is rendered as a PNG card and written to the clipboard. Part of
 ## Install
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/copy-reply-image"
+plugin_manager   action: install_bundle   target: "dsh-copy-reply-image"
 ```
 
 ## How the image is made

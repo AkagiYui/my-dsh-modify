@@ -13,9 +13,9 @@ UI features, a `dsh.client` half whose factory registers into the browser's
 
 | Package | What it does |
 | --- | --- |
-| [`@akagiyui/ui-tweaks`](packages/ui-tweaks/README.md) | Five switches in one: content width, sidebar account label, hide feedback, hide the sidebar More row, skip the Full access dialog |
-| [`@akagiyui/balance-chip`](packages/balance-chip/README.md) | Balance, today's spend and peak/off-peak window in the composer, plus per-turn cost |
-| [`@akagiyui/copy-reply-image`](packages/copy-reply-image/README.md) | Renders a finalized reply as a PNG card and copies it |
+| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.md) | Five switches in one: content width, sidebar account label, hide feedback, hide the sidebar More row, skip the Full access dialog |
+| [`dsh-balance-chip`](packages/balance-chip/README.md) | Balance, today's spend and peak/off-peak window in the composer, plus per-turn cost |
+| [`dsh-copy-reply-image`](packages/copy-reply-image/README.md) | Renders a finalized reply as a PNG card and copies it |
 
 `ui-tweaks` absorbs what used to be four separate single-purpose bundles
 (content width, sidebar account label, hide feedback, hide the More row). They
@@ -26,7 +26,7 @@ are switches inside it now, not packages, so there is nothing to install twice.
 DSH installs a bundle by package spec. Ask the agent, or call the tool directly:
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/ui-tweaks"
+plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
 ```
 
 Each package declares `engines.dsh`, so a Harness version the package was not

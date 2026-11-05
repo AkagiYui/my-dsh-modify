@@ -19,7 +19,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const PACKAGES = path.join(ROOT, 'packages')
 const ICON_LIMIT = 256 * 1024
 const ICON_EXTENSIONS = new Set(['.svg', '.png', '.jpg', '.jpeg', '.webp'])
-const NAME_RE = /^@[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9._-]*$/
+const NAME_RE = /^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/
 const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/
 
 const problems = []
@@ -72,8 +72,8 @@ for (const dir of fs.readdirSync(PACKAGES, { withFileTypes: true }).filter((e) =
     continue
   }
 
-  // Identity: lowercase, scoped, published under a name the author owns.
-  if (!NAME_RE.test(manifest.name ?? '')) fail(label, `name "${manifest.name}" is not a lowercase scoped name`)
+  // Identity: lowercase, optionally scoped, published under a name the author owns.
+  if (!NAME_RE.test(manifest.name ?? '')) fail(label, `name "${manifest.name}" is not a lowercase npm name`)
   if (manifest.private === true) fail(label, '"private": true blocks publishing')
   if (!VERSION_RE.test(manifest.version ?? '')) fail(label, `version "${manifest.version}" is not semver`)
   if (!manifest.description) fail(label, 'description is missing')

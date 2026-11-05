@@ -18,7 +18,7 @@ Five independent interface switches for the DeepSeek Harness Web UI, all in
 DSH installs a bundle by package spec. Ask the agent, or call the tool directly:
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/ui-tweaks"
+plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
 ```
 
 `engines.dsh` is checked before installation: a Harness outside `>=0.2.1-rc.5`

@@ -12,9 +12,9 @@ DeepSeek Harness（DSH）的 Web UI 插件集合，集中在一个仓库里维�
 
 | 包 | 作用 |
 | --- | --- |
-| [`@akagiyui/ui-tweaks`](packages/ui-tweaks/README.zh-CN.md) | 一个插件五个开关：对话内容宽度、侧边栏账号显示、隐藏反馈入口、隐藏侧边栏「更多」、跳过完全权限确认 |
-| [`@akagiyui/balance-chip`](packages/balance-chip/README.zh-CN.md) | 在输入框旁显示余额、今日已用与峰谷时段，并给出每轮对话的花费 |
-| [`@akagiyui/copy-reply-image`](packages/copy-reply-image/README.zh-CN.md) | 把 AI 回复渲染成 PNG 卡片并复制到剪贴板 |
+| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.zh-CN.md) | 一个插件五个开关：对话内容宽度、侧边栏账号显示、隐藏反馈入口、隐藏侧边栏「更多」、跳过完全权限确认 |
+| [`dsh-balance-chip`](packages/balance-chip/README.zh-CN.md) | 在输入框旁显示余额、今日已用与峰谷时段，并给出每轮对话的花费 |
+| [`dsh-copy-reply-image`](packages/copy-reply-image/README.zh-CN.md) | 把 AI 回复渲染成 PNG 卡片并复制到剪贴板 |
 
 `ui-tweaks` 吸收了原本四个独立的单功能包（内容宽度、侧边栏账号显示、隐藏反馈、
 隐藏「更多」）。它们现在是这个插件里的开关，不再是单独的包，因此不存在
@@ -25,7 +25,7 @@ DeepSeek Harness（DSH）的 Web UI 插件集合，集中在一个仓库里维�
 DSH 按包名安装 bundle。直接让 agent 装，或者自己调用工具：
 
 ```text
-plugin_manager   action: install_bundle   target: "@akagiyui/ui-tweaks"
+plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
 ```
 
 每个包都声明了 `engines.dsh`，所以和它未验证过的 Harness 版本会被拒绝安装，

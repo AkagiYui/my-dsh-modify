@@ -1,5 +1,5 @@
 {
-  "name": "@akagiyui/ui-tweaks",
+  "name": "@akagiyui/dsh-ui-tweaks",
   "version": "0.1.0",
   "description": "One place for interface tweaks: conversation content width, sidebar account label, hiding the feedback entries, the sidebar More row, and the Full access risk dialog.",
   "license": "MIT",

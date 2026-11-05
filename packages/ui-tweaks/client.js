@@ -1,5 +1,5 @@
 window.__ModuleLoader__.load({
-  id: '@akagiyui/ui-tweaks',
+  id: '@akagiyui/dsh-ui-tweaks',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
@@ -817,10 +817,10 @@ window.__ModuleLoader__.load({
         ctx.effect(() => {
           // Drop stylesheets left behind by an earlier bundle generation so a
           // re-install never stacks duplicate rules.
-          for (const stale of document.querySelectorAll('style[data-plugin-css^="@akagiyui/ui-tweaks/"]')) stale.remove();
+          for (const stale of document.querySelectorAll('style[data-plugin-css^="@akagiyui/dsh-ui-tweaks/"]')) stale.remove();
           const tag = document.createElement('style');
-          tag.dataset.plugin = '@akagiyui/ui-tweaks';
-          tag.dataset.pluginCss = '@akagiyui/ui-tweaks/ui-tweaks.css';
+          tag.dataset.plugin = '@akagiyui/dsh-ui-tweaks';
+          tag.dataset.pluginCss = '@akagiyui/dsh-ui-tweaks/ui-tweaks.css';
           tag.textContent = CSS;
           document.head.appendChild(tag);
           return () => {

@@ -29,7 +29,7 @@ const en = {
 
 //#region Styles
 
-const STYLE_ID = '@akagiyui/copy-reply-image/actions.css';
+const STYLE_ID = 'dsh-copy-reply-image/actions.css';
 
 /**
  * The button copies the host's 28px action metrics and the tooltip copies the
@@ -395,7 +395,7 @@ function apply(ctx) {
   ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'copy-reply-image: dictionaries');
   ctx.effect(() => {
     const tag = document.createElement('style');
-    tag.dataset.plugin = '@akagiyui/copy-reply-image';
+    tag.dataset.plugin = 'dsh-copy-reply-image';
     tag.dataset.pluginCss = STYLE_ID;
     tag.textContent = CSS;
     document.head.appendChild(tag);

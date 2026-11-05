@@ -18,7 +18,7 @@
  * name comes from the Host, which reads it off the durable event.
  */
 window.__ModuleLoader__.load({
-  id: '@akagiyui/balance-chip',
+  id: 'dsh-balance-chip',
   factory(require) {
     const React = require('react');
     const h = React.createElement;
@@ -739,10 +739,10 @@ window.__ModuleLoader__.load({
       inject: ['slots', 'locale'],
       apply(ctx) {
         ctx.effect(() => {
-          for (const stale of document.querySelectorAll('style[data-plugin-css^="@akagiyui/balance-chip/"]')) stale.remove();
+          for (const stale of document.querySelectorAll('style[data-plugin-css^="dsh-balance-chip/"]')) stale.remove();
           const tag = document.createElement('style');
-          tag.dataset.plugin = '@akagiyui/balance-chip';
-          tag.dataset.pluginCss = '@akagiyui/balance-chip/chip.css';
+          tag.dataset.plugin = 'dsh-balance-chip';
+          tag.dataset.pluginCss = 'dsh-balance-chip/chip.css';
           tag.textContent = CSS;
           document.head.appendChild(tag);
           return () => {
