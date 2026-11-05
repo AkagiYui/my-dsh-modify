@@ -14,12 +14,12 @@ jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       # No registry-url on purpose. It would write an .npmrc expecting
       # NODE_AUTH_TOKEN, while Trusted Publishing authenticates by OIDC and has
       # no token at all.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: '22'
 
