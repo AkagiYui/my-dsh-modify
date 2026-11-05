@@ -1,6 +1,6 @@
 {
   "name": "dsh-copy-reply-image",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Copies an AI reply as a PNG card: one action after the branch button of every finalized assistant message.",
   "license": "MIT",
   "author": "AkagiYui (https://github.com/AkagiYui)",
