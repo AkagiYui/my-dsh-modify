@@ -10,9 +10,10 @@
     "packages/*"
   ],
   "scripts": {
-    "check": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs && node scripts/smoke.mjs",
+    "smoke": "node scripts/smoke.mjs",
     "build": "node packages/copy-reply-image/build.mjs",
-    "pack:dry": "node scripts/check.mjs && node scripts/pack-dry.mjs"
+    "pack:dry": "npm run check && node scripts/pack-dry.mjs"
   },
   "engines": {
     "node": ">=20"

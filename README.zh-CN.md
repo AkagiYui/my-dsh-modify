@@ -72,12 +72,20 @@ copy-reply-image 另外保留 src/ 和 build.mjs：它的 client.js 是生成出
 ## 开发
 
 ```bash
-npm run check      # 校验 manifest、patch 行、client factory id、locale、图标、exports、语法
+npm run check      # 先跑静态校验，再逐个启动 client 半部分
+npm run smoke      # 只跑启动检查
 npm run build      # 从 src/ 重新生成 packages/copy-reply-image/client.js
 npm run pack:dry   # 预览每个包实际会打出的 tarball
 ```
 
-最重要的是 `npm run check`。它抓的是**静默失败**：改名时漏掉 `cordis.patch.yml`，
+`npm run smoke` 会在 vm 里用假的 `window.__ModuleLoader__`、DOM 和 localStorage
+**真跑**每个 `client.js`，然后调用它的 factory 和 `apply`。这是唯一能抓住"语法没问题
+但一加载就抛错"的检查 —— 而 client 半部分抛错在浏览器里是看不见的：DSH 按包名解析它，
+界面只是永远不注册。每个半部分都会在四种存储状态下启动（空、坏 JSON、类型错、别人的键）。
+stub 的覆盖面就是这个测试的维护成本：插件用到新的浏览器 API 时，去 `scripts/smoke.mjs`
+的 `sandbox()` 里补上。
+
+`npm run check` 会跑上面两项。它抓的是**静默失败**：改名时漏掉 `cordis.patch.yml`，
 包能装上，但插入的插件行指向一个不存在的包；漏掉 client factory 的 `id`，包也能
 加载，但界面永远不会注册——因为 DSH 是按包名解析浏览器端那半部分的。
 

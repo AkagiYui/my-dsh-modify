@@ -78,12 +78,22 @@ straight to the subfolder.
 ## Development
 
 ```bash
-npm run check      # manifests, patch rows, client factory ids, locales, icons, exports, syntax
+npm run check      # static checks, then boot every client half
+npm run smoke      # just the boot check
 npm run build      # regenerate packages/copy-reply-image/client.js from src/
 npm run pack:dry   # the exact tarball each package would upload
 ```
 
-`npm run check` is the important one. The failures it catches are silent ones:
+`npm run smoke` evaluates each `client.js` in a vm with a stubbed
+`window.__ModuleLoader__`, DOM and storage, then calls its factory and `apply`.
+That is the only check that can catch a module which parses but throws on load —
+and a client half that throws is invisible in the browser, because DSH resolves
+it by package name and the UI simply never registers. Each half is booted under
+four storage states (empty, malformed JSON, wrong types, foreign keys). The stub
+surface is the maintenance cost: when a plugin starts using a new browser API,
+add it to `sandbox()` in `scripts/smoke.mjs`.
+
+`npm run check` runs both. The failures it catches are silent ones:
 a package rename that misses `cordis.patch.yml` still installs but inserts a row
 naming a package that does not exist, and a rename that misses the client factory
 `id` still loads but never registers, because DSH resolves the browser half by

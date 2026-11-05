@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ matrix.node }}
 
-      - name: Manifests, patch rows, client factory ids, locales, icons
+      - name: Static checks, then boot every client half
         run: npm run check
 
       - name: Tarball contents
