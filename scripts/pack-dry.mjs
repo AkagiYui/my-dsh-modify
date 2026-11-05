@@ -19,6 +19,41 @@ const SUSPICIOUS = [/(^|\/)node_modules\//, /(^|\/)\.git\//, /(^|\/)\.DS_Store$/
 const SIZE_LIMIT = 1024 * 1024
 
 const rows = []
+
+/**
+ * One report per packed package. npm 10 and 11 return `[report]`; a future npm
+ * may return the report bare or keyed by name, so accept all three shapes and
+ * fail with the actual output instead of a TypeError on `undefined.files`.
+ */
+function readPackReport(dirPath) {
+  let stdout
+  try {
+    stdout = execFileSync('npm', ['pack', '--dry-run', '--json'], {
+      cwd: dirPath,
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+    })
+  } catch (error) {
+    const detail = String(error.stderr ?? error.message).trim().split('\n')[0]
+    throw new Error(`npm pack failed — ${detail}`)
+  }
+
+  const text = stdout.trim()
+  let parsed
+  try {
+    parsed = JSON.parse(text)
+  } catch {
+    throw new Error(`npm pack printed non-JSON output — ${JSON.stringify(text.slice(0, 120))}`)
+  }
+
+  const candidates = Array.isArray(parsed)
+    ? parsed
+    : [parsed, ...Object.entries(parsed ?? {}).map(([name, value]) => ({ ...value, name: value?.name ?? name }))]
+  const report = candidates.find((candidate) => candidate && Array.isArray(candidate.files))
+  if (!report) throw new Error(`npm pack output has no file list — ${JSON.stringify(text.slice(0, 160))}`)
+  return report
+}
+
 const warnings = []
 
 for (const entry of fs.readdirSync(PACKAGES, { withFileTypes: true })) {
@@ -27,14 +62,9 @@ for (const entry of fs.readdirSync(PACKAGES, { withFileTypes: true })) {
 
   let report
   try {
-    const stdout = execFileSync('npm', ['pack', '--dry-run', '--json'], {
-      cwd: dirPath,
-      encoding: 'utf8',
-      stdio: ['ignore', 'pipe', 'pipe'],
-    })
-    report = JSON.parse(stdout)[0]
+    report = readPackReport(dirPath)
   } catch (error) {
-    warnings.push(`packages/${entry.name}: npm pack failed — ${String(error.stderr ?? error.message).trim().split('\n')[0]}`)
+    warnings.push(`packages/${entry.name}: ${error.message}`)
     continue
   }
 

@@ -24,7 +24,11 @@ jobs:
           node-version: '22'
 
       # Trusted Publishing requires npm >= 11.5.1; Node 22 ships npm 10.
-      - run: npm install -g npm@latest
+      # Pin the major rather than tracking "latest": npm 12 changed
+      # `npm pack --json` to a name-keyed object, which broke the first CI run.
+      # scripts/pack-dry.mjs now accepts both shapes, and the pin keeps CI
+      # reproducible either way.
+      - run: npm install -g npm@11
 
       - name: Resolve the package from the tag
         id: target
