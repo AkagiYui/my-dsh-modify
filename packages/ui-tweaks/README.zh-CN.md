@@ -33,10 +33,10 @@ plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
   的，但 `/feedback` 命令是通过 plugin manager 的 remote 停用
   `include:command-feedback` 这一行来移除的，所以它是真的从命令目录里消失，而不是
   只是没被画出来。关掉这个开关会恢复它停用的那一行；记录保存在 `localStorage` 的
-  `dsh.ui-tweaks.feedback-command-managed` 键下。
-- **只用一个存储键。** 五个开关都存放在 `dsh.ui-tweaks` 里。首次运行时，会把早期
-  单功能包写下的偏好（`dsh.conversation-content-width`、`dsh.sidebar-account-display`，
-  作为 `localStorage` 键保留）导入一次，所以已有的设置能延续过来。
+  `dsh-ui-tweaks.feedback-command-managed` 键下。
+- **存储键自带归属。** 每个键都是 `<包名>.<用途>`：`dsh-ui-tweaks.preferences` 存五个
+  开关的取值，`dsh-ui-tweaks.feedback-command-managed` 记录本插件是否停用过反馈命令那一行
+  —— 所以关掉开关时只恢复它自己改过的东西，不会波及别的插件。
 
 ## 兼容性
 

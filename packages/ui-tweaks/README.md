@@ -36,11 +36,12 @@ is refused rather than loading an untested plugin.
   disabling the shipped `include:command-feedback` row through the plugin
   manager remote, so it leaves the command catalog instead of merely not being
   drawn. Turning the switch off restores the row it disabled; the record is kept
-  under the `dsh.ui-tweaks.feedback-command-managed` key in `localStorage`.
-- **One storage key.** All five switches live in `dsh.ui-tweaks`. On first run
-  the preferences written by the earlier single-purpose bundles
-  (`dsh.conversation-content-width`, `dsh.sidebar-account-display`, kept as
-  `localStorage` keys) are imported once, so an existing setup carries over.
+  under the `dsh-ui-tweaks.feedback-command-managed` key in `localStorage`.
+- **Storage keys name their owner.** Every key is
+  `<package name>.<purpose>`: `dsh-ui-tweaks.preferences` holds the five
+  switches, and `dsh-ui-tweaks.feedback-command-managed` records whether this
+  plugin disabled the feedback command row, so turning the switch off restores
+  exactly what was changed and nothing else.
 
 ## Compatibility
 

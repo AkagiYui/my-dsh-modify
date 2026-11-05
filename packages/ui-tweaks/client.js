@@ -22,15 +22,14 @@ window.__ModuleLoader__.load({
      *    to its confirm action in the same frame, so picking `完全权限` takes
      *    effect without the modal.
      *
-     * Everything is stored in one key so the five toggles stay consistent, and
-     * the two keys from the former single-purpose bundles are imported once so
-     * existing preferences survive the merge.
+     * Everything is stored under one namespaced key so the five toggles stay
+     * consistent.
      */
 
     const NS = 'ui-tweaks';
-    const STORAGE_KEY = 'dsh.ui-tweaks';
-    const LEGACY_WIDTH_KEY = 'dsh.conversation-content-width';
-    const LEGACY_ACCOUNT_KEY = 'dsh.sidebar-account-display';
+    // Keys are "<package name>.<purpose>", so a key found in devtools names the
+    // bundle that owns it.
+    const STORAGE_KEY = 'dsh-ui-tweaks.preferences';
 
     const ATTR_WIDTH = 'data-dsh-ui-tweaks-width';
     const ATTR_ACCOUNT = 'data-dsh-ui-tweaks-account';
@@ -52,7 +51,7 @@ window.__ModuleLoader__.load({
     // composer menus lose the entry instead of merely hiding it.
     const COMMAND_MODULE = '@deepseek-ai/dsh-command-feedback';
     const COMMAND_ENTRY = 'include:command-feedback';
-    const MANAGED_KEY = 'dsh.ui-tweaks.feedback-command-managed';
+    const MANAGED_KEY = 'dsh-ui-tweaks.feedback-command-managed';
 
     const WIDTH_MODES = ['default', 'wide'];
     const ACCOUNT_MODES = ['original', 'hidden', 'custom'];
@@ -196,53 +195,14 @@ window.__ModuleLoader__.load({
       };
     }
 
-    /**
-     * Import the two keys written by the former single-purpose bundles. The
-     * old keys are left untouched so rolling back to those bundles keeps its
-     * preferences.
-     */
-    function legacyState() {
-      let width = DEFAULTS.width;
-      try {
-        const stored = localStorage.getItem(LEGACY_WIDTH_KEY);
-        if (WIDTH_MODES.includes(stored)) width = stored;
-      } catch (_unreadable) {
-        // Storage being unavailable only costs persistence.
-      }
-
-      let account = { ...DEFAULTS.account };
-      try {
-        const raw = localStorage.getItem(LEGACY_ACCOUNT_KEY);
-        if (raw !== null) {
-          const parsed = JSON.parse(raw);
-          if (ACCOUNT_MODES.includes(parsed?.mode)) {
-            account = {
-              mode: parsed.mode,
-              text: sanitizeText(parsed?.text),
-            };
-          }
-        }
-      } catch (_unreadable) {
-        // A malformed legacy value falls back to the shipped default.
-      }
-
-      return { width, account, hideFeedback: true, hideSidebarMore: true };
-    }
-
     function readState() {
       try {
         const raw = localStorage.getItem(STORAGE_KEY);
         if (raw !== null) return normalize(JSON.parse(raw));
       } catch (_unreadable) {
-        // Fall through to the legacy import.
+        // An unreadable or malformed value falls back to the shipped defaults.
       }
-      const migrated = normalize(legacyState());
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
-      } catch (_full) {
-        // A blocked storage area only costs persistence.
-      }
-      return migrated;
+      return normalize({});
     }
 
     function writeState(next) {
