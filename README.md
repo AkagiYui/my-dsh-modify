@@ -44,6 +44,10 @@ adds a translation can stop a switch from applying, and it will do so quietly â€
 the switch simply stops having an effect. Each package README says which hooks it
 depends on.
 
+All three are versioned `0.x` on purpose: the surface they attach to is still
+moving, so treat any bump as capable of changing behaviour and pin an exact
+version if that matters to you.
+
 ## Layout
 
 ```text

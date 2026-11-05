@@ -85,20 +85,20 @@ Published versions are immutable. Never reuse one.
 # bump the file, commit, tag, publish
 cd packages/ui-tweaks
 npm version patch --no-git-tag-version
-git commit -am "ui-tweaks: 1.4.1"
-git tag ui-tweaks@1.4.1
+git commit -am "ui-tweaks: 0.1.1"
+git tag ui-tweaks@0.1.1
 git push origin main --tags
 npm publish
 ```
 
-`npm version` without `--no-git-tag-version` also creates a `v1.4.1` tag, which
+`npm version` without `--no-git-tag-version` also creates a `v0.1.1` tag, which
 collides across packages in a monorepo. Use the `<package>@<version>` form above.
 
 ### If you publish something wrong
 
 - **Missing files, wrong metadata, still usable:** publish a patch version. Do
   not unpublish.
-- **Broken for everyone:** `npm deprecate @akagiyui/ui-tweaks@1.4.1 "Broken, use 1.4.2"`,
+- **Broken for everyone:** `npm deprecate @akagiyui/ui-tweaks@0.1.1 "Broken, use 0.1.2"`,
   then publish the fix.
 - **Unpublish** only works within 72 hours, only if nothing depends on the
   version, and the version number is burned afterwards.
@@ -119,7 +119,7 @@ Notes for this account:
   specifically.
 - A workflow only appears under the Actions tab after it has been pushed; there
   is nothing to see on GitHub before the first push.
-- Releases: `gh release create ui-tweaks@1.4.1 --notes "..."`.
+- Releases: `gh release create ui-tweaks@0.1.1 --notes "..."`.
 
 ## CI and automated publishing
 
@@ -143,8 +143,8 @@ plain node scripts, so a run takes seconds.
 3. Release with a tag, and the workflow picks the package out of the tag name:
 
 ```bash
-git tag ui-tweaks@1.4.1
-git push origin ui-tweaks@1.4.1
+git tag ui-tweaks@0.1.1
+git push origin ui-tweaks@0.1.1
 ```
 
 The job refuses a tag whose version does not match `package.json`, and refuses a

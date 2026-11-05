@@ -1,6 +1,6 @@
 {
   "name": "@akagiyui/ui-tweaks",
-  "version": "1.4.0",
+  "version": "0.1.0",
   "description": "One place for interface tweaks: conversation content width, sidebar account label, hiding the feedback entries, the sidebar More row, and the Full access risk dialog.",
   "license": "MIT",
   "author": "AkagiYui (https://github.com/AkagiYui)",

@@ -1,6 +1,6 @@
 name: publish
 
-# Tags only, in the form <package>@<version>: ui-tweaks@1.4.1
+# Tags only, in the form <package>@<version>: ui-tweaks@0.1.0
 on:
   push:
     tags:
