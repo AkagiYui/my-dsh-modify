@@ -1,8 +1,10 @@
 # Copy reply as image
 
+English | [简体中文](https://github.com/AkagiYui/my-dsh-modify/blob/main/packages/copy-reply-image/README.zh-CN.md)
+
 Adds **Copy as image** after the branch button of every finalized AI reply: the
 reply is rendered as a PNG card and written to the clipboard. Part of
-[my-dsh-modify](../../README.md).
+[my-dsh-modify](https://github.com/AkagiYui/my-dsh-modify).
 
 ## Install
 

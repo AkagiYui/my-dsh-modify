@@ -1,5 +1,7 @@
 # my-dsh-modify
 
+English | [简体中文](README.zh-CN.md)
+
 DeepSeek Harness (DSH) Web UI plugins, kept in one repository.
 
 Every package here is a **Cordis bundle**: a package whose `package.json`
@@ -58,6 +60,8 @@ packages/<name>/
   client.js           Client half: window.__ModuleLoader__.load({ id, factory })
   locale/{en,zh}.json meta.title / meta.description shown by the plugin manager
   icon.svg            plugin row artwork (<= 256 KiB)
+  README.md           docs; README.zh-CN.md is the Chinese version (npm ships
+                      both automatically, but renders only README.md)
 copy-reply-image additionally keeps src/ and build.mjs: its client.js is generated.
 ```
 

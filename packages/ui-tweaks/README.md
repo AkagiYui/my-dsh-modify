@@ -1,7 +1,9 @@
 # Interface tweaks
 
+English | [简体中文](https://github.com/AkagiYui/my-dsh-modify/blob/main/packages/ui-tweaks/README.zh-CN.md)
+
 Five independent interface switches for the DeepSeek Harness Web UI, all in
-**Settings → General**. Part of [my-dsh-modify](../../README.md).
+**Settings → General**. Part of [my-dsh-modify](https://github.com/AkagiYui/my-dsh-modify).
 
 | Switch | What it changes |
 | --- | --- |

@@ -1,7 +1,9 @@
 # Balance chip
 
+English | [简体中文](https://github.com/AkagiYui/my-dsh-modify/blob/main/packages/balance-chip/README.zh-CN.md)
+
 DeepSeek balance, today's spend and the current peak/off-peak window, shown in
-the composer tool row. Part of [my-dsh-modify](../../README.md).
+the composer tool row. Part of [my-dsh-modify](https://github.com/AkagiYui/my-dsh-modify).
 
 Three surfaces:
 
