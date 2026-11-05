@@ -112,36 +112,53 @@ git push -u origin main
 
 Notes for this account:
 
-- `gh auth status` shows SSH as the git protocol and the token scopes
-  `admin:public_key, gist, read:org, repo`. That is enough for normal pushes.
-- Pushing anything under `.github/workflows/` additionally needs the `workflow`
-  scope: `gh auth refresh -s workflow`.
+- `gh auth status` shows SSH as the git protocol. SSH pushes are not limited by
+  token scopes, so `.github/workflows/` files push fine over SSH. A **HTTPS**
+  push with this token would be refused until you add the `workflow` scope
+  (`gh auth refresh -s workflow`), because that scope governs workflow files
+  specifically.
+- A workflow only appears under the Actions tab after it has been pushed; there
+  is nothing to see on GitHub before the first push.
 - Releases: `gh release create ui-tweaks@1.4.1 --notes "..."`.
 
-## Automating it (optional)
+## CI and automated publishing
 
-npm supports **Trusted Publishing**: on the package's settings page you bind a
-GitHub repository and a workflow filename; the workflow then publishes with a
-short-lived OIDC token instead of a stored `NPM_TOKEN`, and npm attaches a
-provenance attestation automatically.
+Two workflows live in `.github/workflows/`:
 
-```yaml
-permissions:
-  contents: read
-  id-token: write        # required for OIDC
-steps:
-  - uses: actions/checkout@v4
-  - uses: actions/setup-node@v4
-    with:
-      node-version: 22
-      registry-url: https://registry.npmjs.org
-  - run: npm run check
-  - run: npm publish --provenance --access public
-    working-directory: packages/ui-tweaks
+| File | Trigger | Does |
+| --- | --- | --- |
+| `ci.yml` | push to `main`, any pull request, manual | `npm run check`, `npm run pack:dry`, and a check that `client.js` still matches `src/`, on Node 20/22/24 |
+| `publish.yml` | a tag shaped `<package>@<version>` | publishes exactly that package, after re-running the checks |
+
+`ci.yml` needs no `npm ci`: the packages have no dependencies and the checks are
+plain node scripts, so a run takes seconds.
+
+`publish.yml` uses **Trusted Publishing**, so there is no stored token:
+
+1. On npmjs.com, open the package → Settings → Trusted publishing, and bind
+   repository `AkagiYui/my-dsh-modify` with workflow filename `publish.yml`.
+   Repeat per package, once, before the first tag push.
+2. npm then accepts the OIDC token that GitHub mints for the job
+   (`permissions: id-token: write`) and attaches a provenance attestation.
+3. Release with a tag, and the workflow picks the package out of the tag name:
+
+```bash
+git tag ui-tweaks@1.4.1
+git push origin ui-tweaks@1.4.1
 ```
 
-The older route — a granular access token restricted to this scope, stored as
-`NPM_TOKEN` — still works and is simpler to start with.
+The job refuses a tag whose version does not match `package.json`, and refuses a
+tag naming a directory that does not exist, so a typo fails the run instead of
+publishing the wrong thing.
+
+Two footnotes:
+
+- Trusted Publishing needs npm >= 11.5.1; Node 22 ships npm 10, which is why the
+  workflow upgrades npm first.
+- The older route still works and needs no npm-side setup: create a **granular
+  access token** restricted to this scope, store it as `NPM_TOKEN`, and add
+  `registry-url: https://registry.npmjs.org` plus
+  `NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}` to the publish step.
 
 ## Checklist
 

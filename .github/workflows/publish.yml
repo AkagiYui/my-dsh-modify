@@ -1,0 +1,53 @@
+name: publish
+
+# Tags only, in the form <package>@<version>: ui-tweaks@1.4.1
+on:
+  push:
+    tags:
+      - '*@*'
+
+permissions:
+  contents: read
+  id-token: write # Trusted Publishing: npm exchanges this OIDC token for a short-lived credential
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # No registry-url on purpose. It would write an .npmrc expecting
+      # NODE_AUTH_TOKEN, while Trusted Publishing authenticates by OIDC and has
+      # no token at all.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Trusted Publishing requires npm >= 11.5.1; Node 22 ships npm 10.
+      - run: npm install -g npm@latest
+
+      - name: Resolve the package from the tag
+        id: target
+        run: |
+          set -euo pipefail
+          name="${GITHUB_REF_NAME%@*}"
+          version="${GITHUB_REF_NAME#*@}"
+          dir="packages/$name"
+          if [ ! -d "$dir" ]; then
+            echo "::error::tag names a package that does not exist: $dir"
+            exit 1
+          fi
+          actual=$(node -p "require('./$dir/package.json').version")
+          if [ "$actual" != "$version" ]; then
+            echo "::error::tag says $version but $dir/package.json says $actual"
+            exit 1
+          fi
+          echo "dir=$dir" >> "$GITHUB_OUTPUT"
+          echo "Publishing $name@$version from $dir"
+
+      - run: npm run check
+      - run: npm run pack:dry
+
+      - name: Publish
+        working-directory: ${{ steps.target.outputs.dir }}
+        run: npm publish --access public

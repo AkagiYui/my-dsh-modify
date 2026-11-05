@@ -81,6 +81,11 @@ naming a package that does not exist, and a rename that misses the client factor
 `id` still loads but never registers, because DSH resolves the browser half by
 package name.
 
+GitHub Actions runs the same commands on every push and pull request
+([`ci.yml`](.github/workflows/ci.yml)), plus a check that the generated
+`client.js` still matches `src/`. Pushing a tag named `<package>@<version>`
+publishes that one package ([`publish.yml`](.github/workflows/publish.yml)).
+
 ## Publishing
 
 See [PUBLISHING.md](PUBLISHING.md). Short version: `npm login`, then from a
