@@ -90,9 +90,9 @@ naming a package that does not exist, and a rename that misses the client factor
 package name.
 
 GitHub Actions runs the same commands on every push and pull request
-([`ci.yml`](.github/workflows/ci.yml)), plus a check that the generated
+([`ci.yaml`](.github/workflows/ci.yaml)), plus a check that the generated
 `client.js` still matches `src/`. Pushing a tag named `<package>@<version>`
-publishes that one package ([`publish.yml`](.github/workflows/publish.yml)).
+publishes that one package ([`publish.yaml`](.github/workflows/publish.yaml)).
 
 ## Publishing
 

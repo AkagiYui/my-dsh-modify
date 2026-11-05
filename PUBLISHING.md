@@ -127,16 +127,16 @@ Two workflows live in `.github/workflows/`:
 
 | File | Trigger | Does |
 | --- | --- | --- |
-| `ci.yml` | push to `main`, any pull request, manual | `npm run check`, `npm run pack:dry`, and a check that `client.js` still matches `src/`, on Node 20/22/24 |
-| `publish.yml` | a tag shaped `<package>@<version>` | publishes exactly that package, after re-running the checks |
+| `ci.yaml` | push to `main`, any pull request, manual | `npm run check`, `npm run pack:dry`, and a check that `client.js` still matches `src/`, on Node 20/22/24 |
+| `publish.yaml` | a tag shaped `<package>@<version>` | publishes exactly that package, after re-running the checks |
 
-`ci.yml` needs no `npm ci`: the packages have no dependencies and the checks are
+`ci.yaml` needs no `npm ci`: the packages have no dependencies and the checks are
 plain node scripts, so a run takes seconds.
 
-`publish.yml` uses **Trusted Publishing**, so there is no stored token:
+`publish.yaml` uses **Trusted Publishing**, so there is no stored token:
 
 1. On npmjs.com, open the package → Settings → Trusted publishing, and bind
-   repository `AkagiYui/my-dsh-modify` with workflow filename `publish.yml`.
+   repository `AkagiYui/my-dsh-modify` with workflow filename `publish.yaml`.
    Repeat per package, once, before the first tag push.
 2. npm then accepts the OIDC token that GitHub mints for the job
    (`permissions: id-token: write`) and attaches a provenance attestation.

@@ -81,9 +81,9 @@ npm run pack:dry   # 预览每个包实际会打出的 tarball
 包能装上，但插入的插件行指向一个不存在的包；漏掉 client factory 的 `id`，包也能
 加载，但界面永远不会注册——因为 DSH 是按包名解析浏览器端那半部分的。
 
-GitHub Actions 在每次 push 和 PR 时跑同样的命令（[`ci.yml`](.github/workflows/ci.yml)），
+GitHub Actions 在每次 push 和 PR 时跑同样的命令（[`ci.yaml`](.github/workflows/ci.yaml)），
 并额外检查生成的 `client.js` 是否仍与 `src/` 一致。推送形如
-`<包名>@<版本>` 的 tag 会发布该包（[`publish.yml`](.github/workflows/publish.yml)）。
+`<包名>@<版本>` 的 tag 会发布该包（[`publish.yaml`](.github/workflows/publish.yaml)）。
 
 ## 发布
 
