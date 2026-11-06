@@ -5,7 +5,7 @@ window.__ModuleLoader__.load({
     const h = React.createElement;
 
     /**
-     * One bundle for five independent interface tweaks:
+     * One bundle for six independent interface tweaks:
      *
      * 1. Conversation content width — a root attribute widens
      *    `[data-conversation-content]`, from which the chat column, composer,
@@ -21,8 +21,13 @@ window.__ModuleLoader__.load({
      * 5. Full-access risk dialog — the shipped two-step confirmation is driven
      *    to its confirm action in the same frame, so picking `完全权限` takes
      *    effect without the modal.
+     * 6. Side-by-side global panel rows — `sidebar` renders one full-width row
+     *    per panel button (`插件`, `自动化任务`), and the list's own layout is
+     *    the sidebar owner's. A scoped grid therefore pairs the first two rows
+     *    up; every later panel and the More launcher keep a full-width row, and
+     *    the icons stay the registered slot content.
      *
-     * Everything is stored under one namespaced key so the five toggles stay
+     * Everything is stored under one namespaced key so the six toggles stay
      * consistent.
      */
 
@@ -35,6 +40,7 @@ window.__ModuleLoader__.load({
     const ATTR_ACCOUNT = 'data-dsh-ui-tweaks-account';
     const ATTR_FEEDBACK = 'data-dsh-ui-tweaks-feedback';
     const ATTR_MORE = 'data-dsh-ui-tweaks-more';
+    const ATTR_PANELS = 'data-dsh-ui-tweaks-panels';
     const ATTR_CONFIRM = 'data-dsh-ui-tweaks-full-access';
     const ACCOUNT_VAR = '--dsh-ui-tweaks-account-label';
     const ROW_MARK = 'data-dsh-ui-tweaks-feedback-row';
@@ -55,11 +61,17 @@ window.__ModuleLoader__.load({
 
     const WIDTH_MODES = ['default', 'wide'];
     const ACCOUNT_MODES = ['original', 'hidden', 'custom'];
+    const PANEL_MODES = ['stacked', 'inline', 'custom'];
+    /** Cells per line in custom mode; the preset always pairs exactly two. */
+    const PANEL_COLUMNS = [2, 3, 4];
+    /** The sidebar renders at most this many global panels today; picks beyond it are dropped. */
+    const PANEL_PICK_LIMIT = 12;
     const ACCOUNT_MAX_TEXT = 24;
 
     const DEFAULTS = {
       width: 'default',
       account: { mode: 'hidden', text: '' },
+      panels: { mode: 'inline', picks: [], columns: 2 },
       hideFeedback: true,
       hideSidebarMore: true,
       skipFullAccessConfirm: true,
@@ -125,7 +137,7 @@ window.__ModuleLoader__.load({
 
     const zh = {
       'meta.title': '界面微调',
-      'meta.description': '一个插件控制对话内容宽度、侧边栏账号显示，并可按需隐藏反馈入口、侧边栏的「更多」和启用完全权限时的风险确认，开关都在 设置 → 通用 中。',
+      'meta.description': '一个插件控制对话内容宽度、侧边栏账号显示和面板按钮排布，并可按需隐藏反馈入口、侧边栏的「更多」和启用完全权限时的风险确认，开关都在 设置 → 通用 中。',
       'width.title': '对话内容宽度',
       'width.description': '默认沿用内置宽度并可拖动两侧手柄；宽屏让对话内容铺满窗口，左右只保留细边距。',
       'width.mode.default': '默认',
@@ -140,6 +152,17 @@ window.__ModuleLoader__.load({
       'feedback.description': '隐藏回答评分、账号菜单、更多菜单和输入框「+」菜单里的反馈入口，并从 Host 侧停用反馈命令，使其从命令菜单中真正移除。',
       'more.title': '隐藏侧边栏的「更多」',
       'more.description': '隐藏侧边栏面板列表末尾的「更多」入口，插件与自动化任务等入口保持不变。',
+      'panels.title': '面板按钮并排',
+      'panels.description': '把选中的面板入口并排放在一行，其余保持整行；「更多」始终独占一行，侧边栏折叠成图标栏时不受影响。',
+      'panels.mode.stacked': '各自一行',
+      'panels.mode.inline': '前两个并排',
+      'panels.mode.custom': '自定义',
+      'panels.columns.title': '每行几个',
+      'panels.columns.description': '自定义并排时，一行最多放几个面板入口。',
+      'panels.columns.2': '2 个',
+      'panels.columns.3': '3 个',
+      'panels.columns.4': '4 个',
+      'panels.picks.empty': '暂时读不到侧边栏的面板列表。',
       'fullAccess.title': '完全权限二次确认',
       'fullAccess.description': '在权限菜单里选择「完全权限」时，不再弹出勾选风险提示的确认窗口，直接生效。关闭后恢复内置的二次确认。',
       'toggle.show': '显示',
@@ -148,7 +171,7 @@ window.__ModuleLoader__.load({
 
     const en = {
       'meta.title': 'Interface tweaks',
-      'meta.description': 'One plugin for conversation content width, the sidebar account label, and optionally hiding the feedback entries, the sidebar More row, and the Full access risk dialog. Every switch lives in Settings → General.',
+      'meta.description': 'One plugin for conversation content width, the sidebar account label, the panel row layout, and optionally hiding the feedback entries, the sidebar More row, and the Full access risk dialog. Every switch lives in Settings → General.',
       'width.title': 'Conversation content width',
       'width.description': 'Default keeps the built-in width and its side drag handles; widescreen fills the window with slim side gutters.',
       'width.mode.default': 'Default',
@@ -163,6 +186,17 @@ window.__ModuleLoader__.load({
       'feedback.description': 'Hide the reply ratings, the account and More-actions menu entries, and the composer + menu entry, and disable the feedback command on the Host so it leaves the command catalog.',
       'more.title': 'Hide the sidebar More row',
       'more.description': 'Hide the More entry at the end of the sidebar panel list; plugin and automation entries stay unchanged.',
+      'panels.title': 'Side-by-side panel rows',
+      'panels.description': 'Put the selected panel entries on one row and leave the rest full width; More keeps its own row and the collapsed icon rail is unchanged.',
+      'panels.mode.stacked': 'Stacked',
+      'panels.mode.inline': 'First two',
+      'panels.mode.custom': 'Custom',
+      'panels.columns.title': 'Per row',
+      'panels.columns.description': 'How many panel entries share a line in custom mode.',
+      'panels.columns.2': 'Two',
+      'panels.columns.3': 'Three',
+      'panels.columns.4': 'Four',
+      'panels.picks.empty': 'The sidebar panel list is not available yet.',
       'fullAccess.title': 'Full access confirmation',
       'fullAccess.description': 'Choosing Full access in the permission menu applies it at once instead of opening the risk dialog. Turn this off to restore the shipped two-step confirmation.',
       'toggle.show': 'Show',
@@ -178,6 +212,28 @@ window.__ModuleLoader__.load({
       return String(value ?? '').replace(/[\u0000-\u001f\u007f]/g, ' ').slice(0, ACCOUNT_MAX_TEXT);
     }
 
+    /**
+     * Panel layout preference. `picks` records the panel rows (0-based, in the
+     * sidebar's render order) that share a line in `custom` mode; a stored
+     * string is the earlier single-mode value and keeps meaning the preset.
+     */
+    function normalizePanels(raw) {
+      if (typeof raw === 'string') {
+        return { mode: PANEL_MODES.includes(raw) ? raw : DEFAULTS.panels.mode, picks: [], columns: DEFAULTS.panels.columns };
+      }
+      const source = raw !== null && typeof raw === 'object' ? raw : {};
+      const picks = Array.isArray(source.picks)
+        ? [...new Set(source.picks.filter((index) => (
+          Number.isInteger(index) && index >= 0 && index < PANEL_PICK_LIMIT
+        )))].sort((left, right) => left - right)
+        : [];
+      return {
+        mode: PANEL_MODES.includes(source.mode) ? source.mode : DEFAULTS.panels.mode,
+        picks,
+        columns: PANEL_COLUMNS.includes(source.columns) ? source.columns : DEFAULTS.panels.columns,
+      };
+    }
+
     function normalize(raw) {
       const source = raw !== null && typeof raw === 'object' ? raw : {};
       const account = source.account !== null && typeof source.account === 'object' ? source.account : {};
@@ -187,6 +243,7 @@ window.__ModuleLoader__.load({
           mode: ACCOUNT_MODES.includes(account.mode) ? account.mode : DEFAULTS.account.mode,
           text: sanitizeText(account.text),
         },
+        panels: normalizePanels(source.panels),
         hideFeedback: typeof source.hideFeedback === 'boolean' ? source.hideFeedback : DEFAULTS.hideFeedback,
         hideSidebarMore: typeof source.hideSidebarMore === 'boolean' ? source.hideSidebarMore : DEFAULTS.hideSidebarMore,
         skipFullAccessConfirm: typeof source.skipFullAccessConfirm === 'boolean'
@@ -452,6 +509,50 @@ window.__ModuleLoader__.load({
       confirmWatch = null;
     }
 
+    /** The live `custom` pick sheet, created and owned by the stylesheet effect. */
+    let panelStyle = null;
+
+    /**
+     * The sidebar's global panel rows in render order. The sidebar owner draws
+     * one child per visible panel (a Tooltip may or may not wrap the button) and
+     * the More launcher last, so a row is any child that is not the More anchor.
+     * @returns Visible labels, index-aligned with the rows the sheet addresses.
+     */
+    function readPanelRows() {
+      if (typeof document === 'undefined') return [];
+      const nav = document.querySelector('nav[class*="_panelList"]');
+      if (nav === null) return [];
+      const labels = [];
+      for (const child of nav.children) {
+        if (child.matches('[class*="_moreAnchor"]')) continue;
+        const button = child.matches('button') ? child : child.querySelector('button');
+        labels.push(normalizeLabel(button?.getAttribute('aria-label') ?? button?.textContent ?? child.textContent));
+      }
+      return labels;
+    }
+
+    /**
+     * The generated sheet: the line's cell count (two for the preset, the saved
+     * pick count for custom) plus one cell per picked row. Every other row keeps
+     * the base sheet's full-width default.
+     */
+    function panelRuleCss() {
+      if (state.panels.mode === 'stacked') return '';
+      const scope = ':root[data-dsh-ui-tweaks-panels]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"]';
+      const columns = state.panels.mode === 'custom' ? state.panels.columns : 2;
+      const lines = [`${scope} { grid-template-columns: repeat(${columns}, minmax(0, 1fr)); }`];
+      if (state.panels.mode === 'custom') {
+        for (const index of state.panels.picks) {
+          lines.push(`${scope} > :nth-child(${index + 1}) { grid-column: auto; }`);
+        }
+      }
+      return lines.join('\n');
+    }
+
+    function syncPanelRules() {
+      if (panelStyle !== null) panelStyle.textContent = panelRuleCss();
+    }
+
     /** Mirror the whole preference object onto the root element the stylesheet reads. */
     function applyDom() {
       if (typeof document === 'undefined') return;
@@ -481,6 +582,10 @@ window.__ModuleLoader__.load({
 
       if (state.hideSidebarMore) root.setAttribute(ATTR_MORE, '');
       else root.removeAttribute(ATTR_MORE);
+
+      if (state.panels.mode === 'stacked') root.removeAttribute(ATTR_PANELS);
+      else root.setAttribute(ATTR_PANELS, state.panels.mode);
+      syncPanelRules();
 
       if (state.skipFullAccessConfirm) {
         root.setAttribute(ATTR_CONFIRM, '');
@@ -629,6 +734,33 @@ window.__ModuleLoader__.load({
       '{',
       '  display: none !important;',
       '}',
+      '/* Global panel rows: the sidebar owner renders one full-width button per',
+      '   panel in a column, and the collapsed rail turns them into 36px icons.',
+      '   With a panel mode on, the list becomes a grid: every row spans the whole',
+      '   line unless the active mode unpairs it (the first two for `inline`; the',
+      '   picked rows for `custom`, from the generated sheet). The rail rules stay',
+      '   untouched because the frame carries data-sidebar-collapsed. */',
+      ':root[data-dsh-ui-tweaks-panels]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"] {',
+      '  display: grid;',
+      '  grid-template-columns: repeat(2, minmax(0, 1fr)); /* overwritten by the generated sheet */',
+      '  gap: 2px;',
+      '}',
+      ':root[data-dsh-ui-tweaks-panels]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"] > * {',
+      '  min-width: 0;',
+      '  grid-column: 1 / -1;',
+      '}',
+      ':root[data-dsh-ui-tweaks-panels]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"] [class*="_panelRow"] {',
+      '  width: 100%;',
+      '  padding-inline: 6px;',
+      '}',
+      '/* Preset: the first two panel rows share one line. */',
+      ':root[data-dsh-ui-tweaks-panels="inline"]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"] > :nth-child(-n + 2) {',
+      '  grid-column: auto;',
+      '}',
+      '/* After the preset, so a lone panel never pulls the More launcher into a cell. */',
+      ':root[data-dsh-ui-tweaks-panels]:not(:has([data-sidebar-collapsed])) nav[class*="_panelList"] > [class*="_moreAnchor"] {',
+      '  grid-column: 1 / -1;',
+      '}',
       '/* Settings rows follow the shipped General rows: text left, control right, one hairline. */',
       '.dsh-ui-tweaks_row { display: flex; align-items: center; gap: 8px; padding: 16px 0; border-bottom: .5px solid var(--dsw-alias-border-l2); }',
       '.dsh-ui-tweaks_text { display: flex; flex-direction: column; flex: 1; gap: 4px; min-width: 0; padding-right: 48px; }',
@@ -644,6 +776,10 @@ window.__ModuleLoader__.load({
       '.dsh-ui-tweaks_input { box-sizing: border-box; width: 100%; max-width: 320px; height: 32px; margin: 0 0 16px; padding: 0 10px; border: .5px solid var(--dsw-alias-border-l2); border-radius: 8px; background: var(--dsw-alias-bg-layer-1); color: var(--dsw-alias-label-primary); font: inherit; font-size: 13px; }',
       '.dsh-ui-tweaks_input::placeholder { color: var(--dsw-alias-label-secondary); }',
       '.dsh-ui-tweaks_input:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: 1px; }',
+      '/* Custom panel picks: one pill per live panel row, in the sidebar order. */',
+      '.dsh-ui-tweaks_picks { display: flex; flex-wrap: wrap; gap: 4px; padding: 0 0 16px; }',
+      '.dsh-ui-tweaks_pick { height: 30px; padding: 0 10px; border: .5px solid var(--dsw-alias-border-l2); }',
+      '.dsh-ui-tweaks_pick[aria-pressed="true"] { border-color: transparent; }',
     ].join('\n');
 
     /** Bound by the locale service in `apply`; owner rows receive no locale props. */
@@ -760,12 +896,67 @@ window.__ModuleLoader__.load({
     const MoreRow = toggleRow('more.title', 'more.description', 'hideSidebarMore');
     const FullAccessRow = toggleRow('fullAccess.title', 'fullAccess.description', 'skipFullAccessConfirm');
 
+    function PanelsRow(props) {
+      const t = translation(props);
+      const [preference, setPreference] = React.useState(() => state.panels);
+      // Live panel rows: the sidebar order is the index space `picks` records.
+      const labels = readPanelRows();
+      const choose = (patch) => {
+        const next = { ...preference, ...patch };
+        // Entering custom mode starts from the preset the user was looking at.
+        if (next.mode === 'custom' && next.picks.length === 0 && labels.length > 0) {
+          next.picks = labels.length > 1 ? [0, 1] : [0];
+        }
+        commit({ panels: next });
+        setPreference(next);
+      };
+      const togglePick = (index) => {
+        const picks = preference.picks.includes(index)
+          ? preference.picks.filter((value) => value !== index)
+          : [...preference.picks, index].sort((left, right) => left - right);
+        choose({ picks });
+      };
+      const children = [
+        h(Row, { key: 'row', t, title: 'panels.title', description: 'panels.description' },
+          h(Segmented, {
+            t,
+            label: t('panels.title'),
+            value: preference.mode,
+            options: PANEL_MODES.map((value) => ({ value, key: `panels.mode.${value}` })),
+            onChange: (mode) => choose({ mode }),
+          })),
+      ];
+      if (preference.mode === 'custom') {
+        children.push(h(Row, { key: 'columns', t, title: 'panels.columns.title', description: 'panels.columns.description' },
+          h(Segmented, {
+            t,
+            label: t('panels.columns.title'),
+            value: preference.columns,
+            options: PANEL_COLUMNS.map((value) => ({ value, key: `panels.columns.${value}` })),
+            onChange: (columns) => choose({ columns }),
+          })));
+        children.push(h('div', { key: 'picks', className: 'dsh-ui-tweaks_picks' },
+          labels.length === 0
+            ? h('div', { className: 'dsh-ui-tweaks_desc' }, t('panels.picks.empty'))
+            : labels.map((label, index) => h('button', {
+              key: `${index}:${label}`,
+              type: 'button',
+              className: 'dsh-ui-tweaks_opt dsh-ui-tweaks_pick',
+              'aria-pressed': preference.picks.includes(index),
+              title: label,
+              onClick: () => togglePick(index),
+            }, label !== '' ? label : `#${index + 1}`))));
+      }
+      return h('div', { className: 'dsh-ui-tweaks_block' }, children);
+    }
+
     const GENERAL_ROWS = [
       { id: 'ui-tweaks-width', order: 13.1, Component: WidthRow },
       { id: 'ui-tweaks-account', order: 13.2, Component: AccountRow },
       { id: 'ui-tweaks-full-access', order: 13.3, Component: FullAccessRow },
       { id: 'ui-tweaks-feedback', order: 13.4, Component: FeedbackRow },
-      { id: 'ui-tweaks-more', order: 13.5, Component: MoreRow },
+      { id: 'ui-tweaks-panels', order: 13.5, Component: PanelsRow },
+      { id: 'ui-tweaks-more', order: 13.6, Component: MoreRow },
     ];
 
     return {
@@ -788,6 +979,22 @@ window.__ModuleLoader__.load({
           };
         }, 'ui-tweaks: stylesheet');
 
+        // The `custom` picks are positional, so their rules are generated from
+        // the saved indexes and live in a sheet of their own that is rewritten
+        // on every preference change.
+        ctx.effect(() => {
+          const tag = document.createElement('style');
+          tag.dataset.plugin = '@akagiyui/dsh-ui-tweaks';
+          tag.dataset.pluginCss = '@akagiyui/dsh-ui-tweaks/panel-picks.css';
+          document.head.appendChild(tag);
+          panelStyle = tag;
+          syncPanelRules();
+          return () => {
+            panelStyle = null;
+            tag.remove();
+          };
+        }, 'ui-tweaks: panel picks');
+
         ctx.effect(() => {
           applyDom();
           return () => {
@@ -796,6 +1003,7 @@ window.__ModuleLoader__.load({
             root.removeAttribute(ATTR_ACCOUNT);
             root.removeAttribute(ATTR_FEEDBACK);
             root.removeAttribute(ATTR_MORE);
+            root.removeAttribute(ATTR_PANELS);
             root.removeAttribute(ATTR_CONFIRM);
             root.style.removeProperty(ACCOUNT_VAR);
             stopFeedbackWatch();

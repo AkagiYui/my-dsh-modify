@@ -1,7 +1,7 @@
 {
   "name": "dsh-balance-chip",
   "version": "0.1.1",
-  "description": "Shows DeepSeek balance, today's spend and the current peak/off-peak window in the composer tool row.",
+  "description": "Shows DeepSeek balance, today's spend, the peak/off-peak window and per-turn cost in the composer, at the sidebar foot, and beside each reply, with a switch per seat.",
   "license": "MIT",
   "author": "AkagiYui (https://github.com/AkagiYui)",
   "keywords": [

@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Interface tweaks",
-    "description": "One plugin for conversation content width, the sidebar account label, hiding feedback (it disables the feedback command on the Host), the sidebar More row, and the Full access risk dialog. Every switch lives in Settings → General."
+    "description": "One plugin for conversation content width, the sidebar account label, the panel row layout, hiding feedback (it disables the feedback command on the Host), the sidebar More row, and the Full access risk dialog. Every switch lives in Settings → General."
   }
 }

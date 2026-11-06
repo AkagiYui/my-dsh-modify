@@ -1,7 +1,7 @@
 {
   "name": "@akagiyui/dsh-ui-tweaks",
   "version": "0.1.1",
-  "description": "One place for interface tweaks: conversation content width, sidebar account label, hiding the feedback entries, the sidebar More row, and the Full access risk dialog.",
+  "description": "One place for interface tweaks: conversation content width, sidebar account label, side-by-side panel rows, hiding the feedback entries, the sidebar More row, and the Full access risk dialog.",
   "license": "MIT",
   "author": "AkagiYui (https://github.com/AkagiYui)",
   "keywords": [

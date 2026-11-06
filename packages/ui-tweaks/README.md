@@ -2,7 +2,7 @@
 
 English | [简体中文](https://github.com/AkagiYui/my-dsh-modify/blob/main/packages/ui-tweaks/README.zh-CN.md)
 
-Five independent interface switches for the DeepSeek Harness Web UI, all in
+Six independent interface switches for the DeepSeek Harness Web UI, all in
 **Settings → General**. Part of [my-dsh-modify](https://github.com/AkagiYui/my-dsh-modify).
 
 | Switch | What it changes |
@@ -10,6 +10,7 @@ Five independent interface switches for the DeepSeek Harness Web UI, all in
 | Conversation content width | Default width, or a widescreen layout that fills the window |
 | Sidebar account | The shipped name, the avatar alone, or a label you type |
 | Hide feedback entries | Reply ratings, the account and More menu rows, the composer `+` entry, and the `/feedback` command itself |
+| Panel rows side by side | Stacked, the first two panels on one row, or a custom set of panels with 2–4 per row |
 | Hide the sidebar "More" row | Removes the row that opens the global-panel menu |
 | Skip the Full access risk dialog | Confirming "Full access" takes effect without the two-step modal |
 
@@ -37,8 +38,13 @@ is refused rather than loading an untested plugin.
   manager remote, so it leaves the command catalog instead of merely not being
   drawn. Turning the switch off restores the row it disabled; the record is kept
   under the `dsh-ui-tweaks.feedback-command-managed` key in `localStorage`.
+- **Custom panel picks are positional.** The sidebar renders one row per global
+  panel but exposes no panel id in the DOM, so `custom` records the row indexes.
+  The same sheet sets how many cells a line has (2–4).
+  Pinning, unpinning, or installing a panel shifts those indexes, after which the
+  setting shows the picks against the *current* rows — open General and re-pick.
 - **Storage keys name their owner.** Every key is
-  `<package name>.<purpose>`: `dsh-ui-tweaks.preferences` holds the five
+  `<package name>.<purpose>`: `dsh-ui-tweaks.preferences` holds the six
   switches, and `dsh-ui-tweaks.feedback-command-managed` records whether this
   plugin disabled the feedback command row, so turning the switch off restores
   exactly what was changed and nothing else.

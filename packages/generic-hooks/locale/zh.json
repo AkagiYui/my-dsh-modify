@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "生命周期钩子",
+    "description": "把自己的命令绑定到 DeepSeek Harness 的生命周期事件：工具调用、提示词、会话开始、停止、子智能体与错误。命令从 stdin 读取 JSON，退出码 2 拦截该动作。"
+  }
+}

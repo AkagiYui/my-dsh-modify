@@ -2,7 +2,7 @@
 
 [English](https://github.com/AkagiYui/my-dsh-modify/blob/main/packages/ui-tweaks/README.md) | 简体中文
 
-DeepSeek Harness Web UI 的五个独立开关，全部位于 **设置 → 通用**。属于
+DeepSeek Harness Web UI 的六个独立开关，全部位于 **设置 → 通用**。属于
 [my-dsh-modify](https://github.com/AkagiYui/my-dsh-modify) 项目。
 
 | 开关 | 作用 |
@@ -10,6 +10,7 @@ DeepSeek Harness Web UI 的五个独立开关，全部位于 **设置 → 通用
 | 对话内容宽度 | 默认宽度，或铺满窗口的宽屏布局 |
 | 侧边栏账号 | 保留原名、只显示头像，或显示你自己输入的标签 |
 | 隐藏反馈入口 | 回复评分、账号菜单与「更多」菜单里的反馈行、输入框 `+` 菜单项，以及 `/feedback` 命令本身 |
+| 面板按钮并排 | 各自一行、前两个并排，或自己勾选要并排的面板入口（每行 2–4 个） |
 | 隐藏侧边栏「更多」 | 去掉打开全局面板菜单的那一行 |
 | 跳过完全权限确认 | 确认「完全权限」时不再经过两步弹窗 |
 
@@ -34,7 +35,10 @@ plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
   `include:command-feedback` 这一行来移除的，所以它是真的从命令目录里消失，而不是
   只是没被画出来。关掉这个开关会恢复它停用的那一行；记录保存在 `localStorage` 的
   `dsh-ui-tweaks.feedback-command-managed` 键下。
-- **存储键自带归属。** 每个键都是 `<包名>.<用途>`：`dsh-ui-tweaks.preferences` 存五个
+- **自定义并排按位置记录。** 侧边栏每个全局面板渲染一行，但 DOM 里没有面板 id，
+  所以「自定义」记的是行序号；同一张生成的样式表里也记每行放几个（2–4）。固定/取消固定或新装面板会让序号错位，此时设置里列的
+  是**当前**的行，打开 设置 → 通用 重新选一次即可。
+- **存储键自带归属。** 每个键都是 `<包名>.<用途>`：`dsh-ui-tweaks.preferences` 存六个
   开关的取值，`dsh-ui-tweaks.feedback-command-managed` 记录本插件是否停用过反馈命令那一行
   —— 所以关掉开关时只恢复它自己改过的东西，不会波及别的插件。
 
@@ -43,8 +47,9 @@ plugin_manager   action: install_bundle   target: "@akagiyui/dsh-ui-tweaks"
 针对 **DeepSeek Harness 0.2.1-rc.5** 构建并验证。
 
 每个开关都是对着外壳渲染出的标记实现的：CSS 自定义属性、`data-*` 属性、slot 选择器，
-以及——对那两行菜单——一个匹配本地化文案的 `MutationObserver`。「隐藏『更多』那一行」
-没有受支持的 slot 可用，所以才用样式表。DSH 某次发版改掉这些钩子名或更新了翻译，
+以及——对那两行菜单——一个匹配本地化文案的 `MutationObserver`。「隐藏『更多』那一行」和「面板按钮并排」
+没有受支持的 slot 可用，所以才用样式表（后者依赖面板列表的 `_panelList` /
+`_panelRow` 类名后缀和 `data-sidebar-collapsed`）。DSH 某次发版改掉这些钩子名或更新了翻译，
 就可能让某个开关失效；表现形式是那个开关什么也不做，而不是崩溃。
 
 ## 许可证

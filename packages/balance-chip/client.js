@@ -1,13 +1,17 @@
 /**
- * Client half, three surfaces:
+ * Client half, four surfaces:
  *
  *  1. `conversation.composer.dock` — the balance strip after the shipped
  *     context entry. A host-style control: hover tint, held state while its
- *     details are open, click toggles the panel.
- *  2. `conversation.chat.assistant-actions` — the turn's cost, also a real
- *     button (not a hover tooltip). Clicking opens the same panel with the
- *     turn's token breakdown.
- *  3. `shell.overlay` — that panel, shared by both entries. It lives in the
+ *     details are open, click toggles the panel. The composer switch controls
+ *     this seat; it is on by default.
+ *  2. `sidebar.footer.action` — the same reading at the sidebar foot, in a
+ *     full-width row when the column is wide and a compact amount in the
+ *     56px rail. The sidebar switch controls this seat.
+ *  3. `conversation.chat.assistant-actions` — the turn's cost, also a real
+ *     button (not a hover tooltip). The turn-cost switch controls it. Clicking
+ *     opens the same panel with the turn's token breakdown.
+ *  4. `shell.overlay` — that panel, shared by every entry. It lives in the
  *     frame-wide floating layer because the docked composer is the containing
  *     block for fixed children, which would clip and misplace a panel opened
  *     from the composer.
@@ -21,6 +25,7 @@ window.__ModuleLoader__.load({
   id: 'dsh-balance-chip',
   factory(require) {
     const React = require('react');
+    const { Switch } = require('@deepseek-ai/dsh-client-ui-primitives');
     const h = React.createElement;
 
     const NS = 'balance-chip';
@@ -32,6 +37,8 @@ window.__ModuleLoader__.load({
     const BEIJING_OFFSET_MS = 8 * 60 * 60 * 1000;
     const DAY_MS = 24 * 60 * 60 * 1000;
     const PANEL_WIDTH = 268;
+    const PREFERENCE_KEY = 'dsh-balance-chip.preferences';
+    const PREFERENCE_DEFAULTS = { composerDock: true, sidebarFooter: true, turnCost: true };
 
     const zh = {
       balance: '余额',
@@ -54,6 +61,13 @@ window.__ModuleLoader__.load({
       turnModel: '模型 {model}',
       turnTokens: '输入 {input} · 缓存 {cache} · 输出 {output}',
       turnRate: '按{phase}价：输入 ¥{miss}/M · 缓存 ¥{hit}/M · 输出 ¥{out}/M',
+      'settings.title': '显示位置',
+      'settings.composer.title': '输入框底部的余额条',
+      'settings.composer.description': '在输入框卡片下方显示余额、今日已用与峰谷时段。',
+      'settings.sidebar.title': '侧边栏底部的余额条',
+      'settings.sidebar.description': '在侧边栏设置行上方再显示一条；侧栏收起时变成紧凑金额。',
+      'settings.turn.title': '每轮对话结束后的花费',
+      'settings.turn.description': '在每条回复的操作行旁显示这一轮的花费；点击可看 token 明细。',
     };
     const en = {
       balance: 'Balance',
@@ -76,6 +90,13 @@ window.__ModuleLoader__.load({
       turnModel: 'Model {model}',
       turnTokens: 'in {input} · cache {cache} · out {output}',
       turnRate: 'At {phase} rates: in ¥{miss}/M · cache ¥{hit}/M · out ¥{out}/M',
+      'settings.title': 'Where the chip appears',
+      'settings.composer.title': 'Balance strip below the composer',
+      'settings.composer.description': 'Show the balance, today’s spend and the peak or off-peak window under the composer card.',
+      'settings.sidebar.title': 'Balance strip at the sidebar foot',
+      'settings.sidebar.description': 'Add a second strip above the sidebar settings row; it becomes a compact amount in the rail.',
+      'settings.turn.title': 'Cost after each turn',
+      'settings.turn.description': 'Show this turn’s cost beside the reply actions; click it for the token breakdown.',
     };
 
     // CNY per million tokens, [off-peak, peak] — the whale's table, 2026-09-10 rates.
@@ -170,6 +191,44 @@ window.__ModuleLoader__.load({
       '.dsh-bc_refresh:hover { background: var(--dsw-alias-interactive-bg-hover, var(--dsw-alias-bg-layer-2)); }',
       '.dsh-bc_refresh:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: 1px; }',
 
+      // Sidebar foot: a full-width row in the wide column, an amount disc in the rail.
+      '.dsh-bc_foot {',
+      '  box-sizing: border-box; display: flex; align-items: center; gap: 8px;',
+      '  width: calc(100% + 4px); margin: 6px -2px 0; padding: 3px 10px 3px 8px;',
+      '  border: 0; border-radius: 12px; background: transparent;',
+      '  font: inherit; color: var(--dsw-alias-label-secondary); text-align: left;',
+      '  cursor: pointer; -webkit-user-select: none; user-select: none; min-width: 0;',
+      '  transition: background-color 80ms, color 80ms;',
+      '}',
+      '.dsh-bc_foot:hover, .dsh-bc_foot[aria-expanded="true"] {',
+      '  background: var(--dsw-alias-interactive-bg-hover, var(--dsw-alias-bg-layer-2));',
+      '}',
+      '.dsh-bc_foot:focus-visible { outline: 2px solid var(--dsw-alias-brand-primary); outline-offset: 1px; }',
+      '.dsh-bc_footText { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }',
+      '.dsh-bc_footTop { display: flex; align-items: baseline; gap: 6px; min-width: 0; white-space: nowrap; }',
+      '.dsh-bc_footLabel { font-size: 11px; line-height: 14px; color: var(--dsw-alias-label-secondary); }',
+      '.dsh-bc_footValue { font-size: 13px; line-height: 16px; color: var(--dsw-alias-label-primary); font-variant-numeric: tabular-nums; }',
+      '.dsh-bc_footSub { display: flex; align-items: center; gap: 5px; overflow: hidden; white-space: nowrap; font-size: 11px; line-height: 14px; color: var(--dsw-alias-label-secondary); }',
+      '.dsh-bc_footRail {',
+      '  width: 36px; height: 36px; margin: 0; padding: 0; gap: 0;',
+      '  justify-content: center; border-radius: 50%; flex: none; position: relative;',
+      '}',
+      '.dsh-bc_footRailValue { font-size: 10px; line-height: 12px; letter-spacing: -.2px; color: var(--dsw-alias-label-primary); font-variant-numeric: tabular-nums; }',
+      '.dsh-bc_footDot { position: absolute; top: 4px; right: 4px; width: 6px; height: 6px; border-radius: 50%; }',
+      '.dsh-bc_peakDot { background: var(--dsw-alias-state-error-primary); }',
+      '.dsh-bc_valleyDot { background: var(--dsw-alias-state-success-primary); }',
+      // The shipped foot row is one flex line. Stack it so the Cordis panel
+      // entry and this strip each keep a full-width row.
+      'div:has(> .dsh-bc_foot) { flex-direction: column; align-items: stretch; gap: 2px; }',
+
+      // Plugin-page preference rows, matching the shipped settings rows.
+      '.dsh-bc_settings { display: flex; flex-direction: column; }',
+      '.dsh-bc_prefHead { padding: 2px 0 8px; color: var(--dsw-alias-label-primary); font-size: 13px; font-weight: 500; line-height: 20px; }',
+      '.dsh-bc_pref { display: flex; align-items: center; gap: 8px; padding: 16px 0; border-bottom: .5px solid var(--dsw-alias-border-l2); }',
+      '.dsh-bc_pref:last-child { border-bottom: 0; }',
+      '.dsh-bc_prefText { display: flex; flex-direction: column; flex: 1; gap: 4px; min-width: 0; padding-right: 48px; }',
+      '.dsh-bc_prefTitle { color: var(--dsw-alias-label-primary); font-size: 14px; font-weight: 400; line-height: 22px; }',
+      '.dsh-bc_prefDesc { color: var(--dsw-alias-label-secondary); font-size: 12px; font-weight: 400; line-height: 18px; }',
       '[data-clock="end"] > span:last-child { order: 2; }',
     ].join('\n');
 
@@ -185,6 +244,16 @@ window.__ModuleLoader__.load({
       if (value === 0) return '¥0';
       const digits = value < 0.01 ? 4 : value < 1 ? 3 : 2;
       return '¥' + value.toFixed(digits);
+    }
+
+    /** The 36px rail disc has room for six glyphs; keep the reading legible there. */
+    function compactMoney(value, currency) {
+      if (typeof value !== 'number' || !Number.isFinite(value)) return '—';
+      const symbol = SYMBOLS[currency] || '';
+      if (Math.abs(value) >= 1e6) return symbol + (value / 1e6).toFixed(1) + 'M';
+      if (Math.abs(value) >= 1000) return symbol + (value / 1000).toFixed(1) + 'k';
+      if (Math.abs(value) >= 100) return symbol + value.toFixed(0);
+      return symbol + value.toFixed(2);
     }
 
     /** Fixed-point addition, the whale's 8-decimal ledger unit. */
@@ -269,7 +338,7 @@ window.__ModuleLoader__.load({
     // One panel at a time, in one of two modes: the composer strip's balance
     // reading, or one turn's cost breakdown.
     const panel = {
-      snapshot: { open: false, mode: 'balance', anchor: null, reading: null, refresh: null, turn: null },
+      snapshot: { open: false, mode: 'balance', origin: 'composer', anchor: null, reading: null, refresh: null, turn: null },
       listeners: new Set(),
     };
 
@@ -300,51 +369,152 @@ window.__ModuleLoader__.load({
 
     //#endregion
 
-    //#region Composer strip
+    //#region Preferences and shared reading
 
-    function BalanceChip(props) {
-      const t = typeof props.t === 'function' ? props.t : (key) => key;
-      const [reading, setReading] = React.useState(null);
-      const [clock, setClock] = React.useState(() => Date.now());
-      const panelState = usePanelState();
-      const buttonRef = React.useRef(null);
-      const mounted = React.useRef(true);
+    /** Bound by the locale service in `apply`; the plugin page passes no locale props. */
+    let translate = (key) => key;
 
-      const load = React.useCallback(async (force) => {
+    function translation(props) {
+      const source = props ?? {};
+      if (typeof source.t === 'function') return source.t;
+      return translate;
+    }
+
+    function readPreferences() {
+      const next = { ...PREFERENCE_DEFAULTS };
+      try {
+        const raw = localStorage.getItem(PREFERENCE_KEY);
+        if (raw !== null) {
+          const parsed = JSON.parse(raw);
+          if (parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)) {
+            for (const field of Object.keys(next)) {
+              if (typeof parsed[field] === 'boolean') next[field] = parsed[field];
+            }
+          }
+        }
+      } catch (_unreadable) {
+        // A blocked or malformed value falls back to the shipped defaults.
+      }
+      return next;
+    }
+
+    const preferences = {
+      state: readPreferences(),
+      listeners: new Set(),
+      subscribe(listener) {
+        this.listeners.add(listener);
+        return () => {
+          this.listeners.delete(listener);
+        };
+      },
+      commit(patch) {
+        this.state = { ...this.state, ...patch };
+        try {
+          localStorage.setItem(PREFERENCE_KEY, JSON.stringify(this.state));
+        } catch (_full) {
+          // A blocked storage area only costs persistence, never the live change.
+        }
+        for (const listener of [...this.listeners]) listener();
+      },
+    };
+
+    function usePreference(field) {
+      const [enabled, setEnabled] = React.useState(preferences.state[field] === true);
+      React.useEffect(() => {
+        const sync = () => setEnabled(preferences.state[field] === true);
+        const off = preferences.subscribe(sync);
+        sync();
+        return off;
+      }, [field]);
+      return enabled;
+    }
+
+    // One timer and one HTTP read feed both the composer strip and the sidebar
+    // foot, so the second seat costs no extra polling while both are mounted.
+    const readingStore = { snapshot: null, listeners: new Set(), timer: null };
+
+    function publishReading(reading) {
+      readingStore.snapshot = reading;
+      for (const listener of [...readingStore.listeners]) listener(reading);
+    }
+
+    function readBalance(force) {
+      return (async () => {
         try {
           const response = await fetch(ENDPOINT + (force ? '?refresh=1' : ''), {
             headers: { Accept: 'application/json' },
             cache: 'no-store',
           });
           if (!response.ok) throw new Error('HTTP ' + response.status);
-          const data = await response.json();
-          if (mounted.current) setReading(data);
+          publishReading(await response.json());
         } catch (_offline) {
-          if (!mounted.current) return;
-          setReading((previous) => (previous && previous.ok === true
+          const previous = readingStore.snapshot;
+          publishReading(previous && previous.ok === true
             ? { ...previous, stale: true }
-            : { ok: false }));
+            : { ok: false });
         }
+      })();
+    }
+
+    function refreshReading() {
+      return readBalance(true);
+    }
+
+    function subscribeReading(listener) {
+      readingStore.listeners.add(listener);
+      if (readingStore.timer === null) {
+        readBalance(false);
+        readingStore.timer = setInterval(() => readBalance(false), POLL_MS);
+      } else {
+        listener(readingStore.snapshot);
+      }
+      return () => {
+        readingStore.listeners.delete(listener);
+        if (readingStore.listeners.size === 0) {
+          clearInterval(readingStore.timer);
+          readingStore.timer = null;
+        }
+      };
+    }
+
+    function useBalanceReading() {
+      const [reading, setReading] = React.useState(readingStore.snapshot);
+      React.useEffect(() => {
+        const sync = (value) => setReading(value);
+        const off = subscribeReading(sync);
+        sync(readingStore.snapshot);
+        return off;
       }, []);
+      return reading;
+    }
+
+    //#endregion
+
+    //#region Composer strip
+
+    function BalanceChip(props) {
+      const t = typeof props.t === 'function' ? props.t : (key) => key;
+      const reading = useBalanceReading();
+      const [clock, setClock] = React.useState(() => Date.now());
+      const panelState = usePanelState();
+      const buttonRef = React.useRef(null);
+      const anchorRef = React.useRef(null);
 
       React.useEffect(() => {
-        mounted.current = true;
-        load(false);
-        const poll = setInterval(() => load(false), POLL_MS);
+        anchorRef.current = buttonRef.current;
         const tick = setInterval(() => setClock(Date.now()), TICK_MS);
         return () => {
-          mounted.current = false;
-          clearInterval(poll);
           clearInterval(tick);
-          closePanel();
+          // A session switch unmounts this seat; only close a panel it anchored.
+          if (panel.snapshot.open === true && panel.snapshot.anchor === anchorRef.current) closePanel();
         };
-      }, [load]);
+      }, []);
 
       // Keep the open panel in step with the live reading.
       React.useEffect(() => {
         if (panel.snapshot.mode !== 'balance') return;
-        setPanel({ reading, refresh: () => load(true) });
-      }, [reading, load]);
+        setPanel({ reading, refresh: refreshReading });
+      }, [reading]);
 
       const ready = Boolean(reading && reading.ok === true);
       const currency = ready ? reading.currency : undefined;
@@ -370,9 +540,10 @@ window.__ModuleLoader__.load({
         setPanel({
           open: true,
           mode: 'balance',
+          origin: 'composer',
           anchor,
           reading,
-          refresh: () => load(true),
+          refresh: refreshReading,
         });
       };
 
@@ -392,6 +563,139 @@ window.__ModuleLoader__.load({
         h('span', { className: phaseClass },
           h('span', null, t(peak ? 'peak' : 'offpeak')),
           countdown === '' ? null : h('span', { className: 'dsh-bc_val' }, countdown)));
+    }
+
+    //#endregion
+
+    //#region Sidebar footer and its switch
+
+    function SidebarBalanceChip(props) {
+      const t = typeof props.t === 'function' ? props.t : translation(props);
+      const wide = props.wide === true;
+      const reading = useBalanceReading();
+      const [clock, setClock] = React.useState(() => Date.now());
+      const panelState = usePanelState();
+      const buttonRef = React.useRef(null);
+      const anchorRef = React.useRef(null);
+
+      React.useEffect(() => {
+        anchorRef.current = buttonRef.current;
+        const tick = setInterval(() => setClock(Date.now()), TICK_MS);
+        return () => {
+          clearInterval(tick);
+          // Turning the seat off must not leave a detached anchor behind.
+          if (panel.snapshot.open === true && panel.snapshot.anchor === anchorRef.current) closePanel();
+        };
+      }, []);
+
+      // Keep the open panel in step with the live reading.
+      React.useEffect(() => {
+        if (panel.snapshot.mode !== 'balance') return;
+        setPanel({ reading, refresh: refreshReading });
+      }, [reading]);
+
+      const ready = Boolean(reading && reading.ok === true);
+      const currency = ready ? reading.currency : undefined;
+      const balanceText = ready ? money(reading.balance, currency) : '—';
+      const todayText = ready ? money(reading.todayUsage, currency) : '—';
+      const peak = isPeak(clock);
+      const next = nextSwitch(clock);
+      const countdown = remaining(next === null ? null : next - clock);
+      const phaseClass = 'dsh-bc_item dsh-bc_phase ' + (peak ? 'dsh-bc_peak' : 'dsh-bc_valley');
+      const expanded = panelState.open === true && panelState.mode === 'balance' && panelState.anchor === buttonRef.current;
+      const phaseText = t(peak ? 'peak' : 'offpeak') + (countdown === '' ? '' : ' ' + countdown);
+      const title = [
+        t('details'),
+        t('balance') + ' ' + balanceText,
+        t('today') + ' ' + todayText,
+        phaseText,
+      ].join(' · ');
+
+      const toggle = () => {
+        const anchor = buttonRef.current;
+        if (isThisPanelOpen('balance', anchor)) {
+          closePanel();
+          return;
+        }
+        setPanel({
+          open: true,
+          mode: 'balance',
+          origin: 'footer',
+          anchor,
+          reading,
+          refresh: refreshReading,
+        });
+      };
+
+      const common = {
+        type: 'button',
+        ref: buttonRef,
+        className: 'dsh-bc_foot' + (wide ? '' : ' dsh-bc_footRail'),
+        'aria-haspopup': 'dialog',
+        'aria-expanded': expanded ? 'true' : 'false',
+        'aria-label': title,
+        title,
+        onClick: toggle,
+      };
+
+      if (!wide) {
+        return h('button', common,
+          h('span', { className: 'dsh-bc_footRailValue' }, compactMoney(ready ? reading.balance : undefined, currency)),
+          h('span', {
+            className: 'dsh-bc_footDot ' + (peak ? 'dsh-bc_peakDot' : 'dsh-bc_valleyDot'),
+            'aria-hidden': true,
+          }));
+      }
+
+      return h('button', common,
+        h('span', { className: 'dsh-bc_footText' },
+          h('span', { className: 'dsh-bc_footTop' },
+            h('span', { className: 'dsh-bc_footLabel' }, t('balance')),
+            h('span', { className: 'dsh-bc_footValue' }, balanceText)),
+          h('span', { className: 'dsh-bc_footSub' },
+            h('span', null, t('today') + ' ' + todayText),
+            h('span', { className: 'dsh-bc_sep' }, '·'),
+            h('span', { className: phaseClass },
+              h('span', null, t(peak ? 'peak' : 'offpeak')),
+              countdown === '' ? null : h('span', { className: 'dsh-bc_val' }, countdown)))));
+    }
+
+    /** One plugin-page preference: text on the left, the host Switch on the right. */
+    function PreferenceRow({ t, field, titleKey, descriptionKey }) {
+      const enabled = usePreference(field);
+      return h('div', { className: 'dsh-bc_pref' },
+        h('div', { className: 'dsh-bc_prefText' },
+          h('div', { className: 'dsh-bc_prefTitle' }, t(titleKey)),
+          h('div', { className: 'dsh-bc_prefDesc' }, t(descriptionKey))),
+        h(Switch, {
+          checked: enabled,
+          label: t(titleKey),
+          onChange: (next) => preferences.commit({ [field]: next === true }),
+        }));
+    }
+
+    function BalanceSettings(props) {
+      const t = translation(props);
+      return h('div', { className: 'dsh-bc_settings' },
+        h('div', { className: 'dsh-bc_prefHead' }, t('settings.title')),
+        h(PreferenceRow, {
+          t,
+          field: 'composerDock',
+          titleKey: 'settings.composer.title',
+          descriptionKey: 'settings.composer.description',
+        }),
+        h(PreferenceRow, {
+          t,
+          field: 'sidebarFooter',
+          titleKey: 'settings.sidebar.title',
+          descriptionKey: 'settings.sidebar.description',
+        }),
+        h(PreferenceRow, {
+          t,
+          field: 'turnCost',
+          titleKey: 'settings.turn.title',
+          descriptionKey: 'settings.turn.description',
+        }));
     }
 
     //#endregion
@@ -583,6 +887,7 @@ window.__ModuleLoader__.load({
         setPanel({
           open: true,
           mode: 'turn',
+          origin: 'turn',
           anchor,
           turn: {
             cost,
@@ -713,9 +1018,14 @@ window.__ModuleLoader__.load({
       if (!open) return null;
 
       const rect = state.anchor.getBoundingClientRect();
-      const left = Math.max(12, Math.min(rect.left, window.innerWidth - PANEL_WIDTH - 12));
+      const above = Math.max(12, Math.min(rect.left, window.innerWidth - PANEL_WIDTH - 12));
+      // A footer anchor is at the bottom of the left column; opening the panel
+      // to its right keeps the sidebar's own rows unobstructed when it fits.
+      const beside = state.origin === 'footer' && rect.right + 8 + PANEL_WIDTH <= window.innerWidth - 12
+        ? rect.right + 8
+        : above;
       const style = {
-        left: left + 'px',
+        left: beside + 'px',
         top: Math.max(12, rect.top - 8) + 'px',
         transform: 'translateY(-100%)',
       };
@@ -752,19 +1062,80 @@ window.__ModuleLoader__.load({
 
         ctx.effect(() => ctx.locale.register(NS, { zh, en }), 'balance-chip: dictionaries');
 
-        ctx.slots.inject('conversation.composer.dock', () => ctx.slots.register({
-          name: 'conversation.composer.dock',
-          id: 'balance-chip',
-          order: 2,
-          locale: NS,
-        }, BalanceChip));
+        ctx.effect(() => {
+          const bound = ctx.locale.bind(NS);
+          translate = (key) => bound(key);
+          return () => {
+            translate = (key) => key;
+          };
+        }, 'balance-chip: translations');
 
-        ctx.slots.inject('conversation.chat.assistant-actions', () => ctx.slots.register({
-          name: 'conversation.chat.assistant-actions',
-          id: 'balance-chip-turn',
-          order: 50,
-          locale: NS,
-        }, TurnCost));
+        // The bundle page dispatches one key per package name. This profile
+        // links the package as @local/balance-chip, while npm installs it as
+        // dsh-balance-chip, so claim the page under both names.
+        ctx.slots.inject('plugins.bundle.config', () => {
+          const disposers = ['dsh-balance-chip', '@local/balance-chip'].map((name) => ctx.slots.register({
+            name: 'plugins.bundle.config',
+            key: name,
+            locale: NS,
+          }, BalanceSettings));
+          return () => {
+            for (const dispose of disposers) {
+              if (typeof dispose === 'function') dispose();
+            }
+          };
+        });
+
+        // Every display seat is independently switchable. The overlay panel
+        // stays registered so any seat can open it again after being turned on.
+        ctx.effect(() => {
+          const seats = [
+            {
+              field: 'composerDock',
+              slot: 'conversation.composer.dock',
+              options: { name: 'conversation.composer.dock', id: 'balance-chip', order: 2 },
+              component: BalanceChip,
+            },
+            {
+              field: 'sidebarFooter',
+              slot: 'sidebar.footer.action',
+              options: { name: 'sidebar.footer.action', id: 'balance-chip-footer', order: 1 },
+              component: SidebarBalanceChip,
+            },
+            {
+              field: 'turnCost',
+              slot: 'conversation.chat.assistant-actions',
+              options: { name: 'conversation.chat.assistant-actions', id: 'balance-chip-turn', order: 50 },
+              component: TurnCost,
+            },
+          ];
+          const active = new Map();
+          const sync = () => {
+            for (const seat of seats) {
+              const enabled = preferences.state[seat.field] === true;
+              if (enabled && !active.has(seat.field)) {
+                const off = ctx.slots.inject(seat.slot, () => ctx.slots.register({
+                  ...seat.options,
+                  locale: NS,
+                }, seat.component));
+                active.set(seat.field, typeof off === 'function' ? off : null);
+              } else if (!enabled && active.has(seat.field)) {
+                const off = active.get(seat.field);
+                if (typeof off === 'function') off();
+                active.delete(seat.field);
+              }
+            }
+          };
+          const stop = preferences.subscribe(sync);
+          sync();
+          return () => {
+            stop();
+            for (const off of active.values()) {
+              if (typeof off === 'function') off();
+            }
+            active.clear();
+          };
+        }, 'balance-chip: display seats');
 
         ctx.slots.inject('shell.overlay', () => ctx.slots.register({
           name: 'shell.overlay',

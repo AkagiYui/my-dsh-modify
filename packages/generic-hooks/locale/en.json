@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Lifecycle hooks",
+    "description": "Bind your own commands to DeepSeek Harness lifecycle events: tool calls, prompts, session start, stop, subagents and errors. Each command gets a JSON payload on stdin and exit code 2 blocks the action."
+  }
+}

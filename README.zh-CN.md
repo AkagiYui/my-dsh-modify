@@ -12,8 +12,8 @@ DeepSeek Harness（DSH）的 Web UI 插件集合，集中在一个仓库里维�
 
 | 包 | 作用 |
 | --- | --- |
-| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.zh-CN.md) | 一个插件五个开关：对话内容宽度、侧边栏账号显示、隐藏反馈入口、隐藏侧边栏「更多」、跳过完全权限确认 |
-| [`dsh-balance-chip`](packages/balance-chip/README.zh-CN.md) | 在输入框旁显示余额、今日已用与峰谷时段，并给出每轮对话的花费 |
+| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.zh-CN.md) | 一个插件六个开关：对话内容宽度、侧边栏账号显示、面板按钮并排、隐藏反馈入口、隐藏侧边栏「更多」、跳过完全权限确认 |
+| [`dsh-balance-chip`](packages/balance-chip/README.zh-CN.md) | 在输入框旁和可选的侧边栏底部显示余额、今日已用与峰谷时段，并给出每轮对话的花费 |
 | [`dsh-copy-reply-image`](packages/copy-reply-image/README.zh-CN.md) | 把 AI 回复渲染成 PNG 卡片并复制到剪贴板 |
 
 `ui-tweaks` 吸收了原本四个独立的单功能包（内容宽度、侧边栏账号显示、隐藏反馈、

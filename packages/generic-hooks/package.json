@@ -1,0 +1,58 @@
+{
+  "name": "dsh-generic-hooks",
+  "version": "0.1.0",
+  "description": "Lifecycle hooks without a dialect: bind your own commands to DeepSeek Harness events, with a JSON payload on stdin and exit-code decisions.",
+  "license": "MIT",
+  "author": "AkagiYui (https://github.com/AkagiYui)",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "cordis",
+    "hooks",
+    "lifecycle",
+    "automation"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AkagiYui/my-dsh-modify.git",
+    "directory": "packages/generic-hooks"
+  },
+  "homepage": "https://github.com/AkagiYui/my-dsh-modify/tree/main/packages/generic-hooks#readme",
+  "bugs": {
+    "url": "https://github.com/AkagiYui/my-dsh-modify/issues"
+  },
+  "engines": {
+    "dsh": ">=0.2.1-rc.5"
+  },
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-plugin-manager"
+      ]
+    }
+  }
+}

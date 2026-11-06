@@ -1,6 +1,6 @@
 {
   "meta": {
     "title": "Balance chip",
-    "description": "Shows DeepSeek balance, today's spend and the current peak or off-peak window in the composer tool row; click to refresh."
+    "description": "Shows DeepSeek balance, today's spend, the peak or off-peak window and per-turn cost in the composer, at the sidebar foot, and beside each reply; each seat has a switch."
   }
 }

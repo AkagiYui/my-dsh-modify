@@ -13,8 +13,8 @@ UI features, a `dsh.client` half whose factory registers into the browser's
 
 | Package | What it does |
 | --- | --- |
-| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.md) | Five switches in one: content width, sidebar account label, hide feedback, hide the sidebar More row, skip the Full access dialog |
-| [`dsh-balance-chip`](packages/balance-chip/README.md) | Balance, today's spend and peak/off-peak window in the composer, plus per-turn cost |
+| [`@akagiyui/dsh-ui-tweaks`](packages/ui-tweaks/README.md) | Six switches in one: content width, sidebar account label, side-by-side panel rows, hide feedback, hide the sidebar More row, skip the Full access dialog |
+| [`dsh-balance-chip`](packages/balance-chip/README.md) | Balance, today's spend and peak/off-peak window in the composer and optionally at the sidebar foot, plus per-turn cost |
 | [`dsh-copy-reply-image`](packages/copy-reply-image/README.md) | Renders a finalized reply as a PNG card and copies it |
 
 `ui-tweaks` absorbs what used to be four separate single-purpose bundles
